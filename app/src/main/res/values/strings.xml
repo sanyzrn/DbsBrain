@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">مغز دوم</string>
+    <!-- Manifesto line, the interface voice. "Remember less, live more." -->
+    <string name="manifesto">کمتر به یاد آور، بیشتر زندگی کن.</string>
+    <string name="phase_zero_ready">پایه‌ها آماده‌ست.</string>
+    <string name="timeline">خط زمان</string>
+    <string name="inbox">صندوق ورودی</string>
+    <string name="search">جستجو</string>
+</resources>
