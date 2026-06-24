@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Framework theme only as a launch substrate. The real look is the
+         Compose design system; we deliberately avoid Material component theming. -->
+    <style name="Theme.SecondBrain" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/sb_paper</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+</resources>
