@@ -1,6 +1,8 @@
 package ir.dbsgraphic.secondbrain
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -28,6 +30,7 @@ class MainActivity : ComponentActivity() {
         var keepSplash = true
         splashScreen.setKeepOnScreenCondition { keepSplash }
 
+        handleShare(intent)
         enableEdgeToEdge()
         setContent {
             val state by appViewModel.state.collectAsStateWithLifecycle()
@@ -50,6 +53,20 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleShare(intent)
+    }
+
+    /** Shared-from-another-app capture (text or image) → Inbox. */
+    private fun handleShare(intent: Intent?) {
+        if (intent?.action != Intent.ACTION_SEND) return
+        if (appViewModel.ingestShareIntent(intent)) {
+            Toast.makeText(this, "به صندوق ورودی اضافه شد", Toast.LENGTH_SHORT).show()
         }
     }
 }

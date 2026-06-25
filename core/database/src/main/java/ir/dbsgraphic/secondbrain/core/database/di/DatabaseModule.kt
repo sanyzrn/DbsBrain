@@ -2,11 +2,14 @@ package ir.dbsgraphic.secondbrain.core.database.di
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import ir.dbsgraphic.secondbrain.core.database.FtsSchema
 import ir.dbsgraphic.secondbrain.core.database.MIGRATION_1_2
 import ir.dbsgraphic.secondbrain.core.database.MIGRATION_2_3
 import ir.dbsgraphic.secondbrain.core.database.SecondBrainDatabase
@@ -40,6 +43,21 @@ object DatabaseModule {
         )
             .openHelperFactory(factory)
             .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+            // The FTS5 table isn't a Room @Entity, so migrations alone miss the
+            // fresh-install path. Create it on open (idempotent) and backfill any
+            // items missing from the index — this also repairs older databases.
+            .addCallback(object : RoomDatabase.Callback() {
+                override fun onCreate(db: SupportSQLiteDatabase) {
+                    super.onCreate(db)
+                    FtsSchema.createTableAndTriggers(db)
+                }
+
+                override fun onOpen(db: SupportSQLiteDatabase) {
+                    super.onOpen(db)
+                    FtsSchema.createTableAndTriggers(db)
+                    FtsSchema.backfillMissing(db)
+                }
+            })
             .build()
     }
 

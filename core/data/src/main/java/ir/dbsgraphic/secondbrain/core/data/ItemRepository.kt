@@ -22,6 +22,16 @@ interface ItemRepository {
      */
     suspend fun capture(content: String): String
 
+    /**
+     * Capture something shared from another app — text, or an image/file blob
+     * (capturedVia = share). Still lands formless in the Inbox (§3).
+     */
+    suspend fun captureShared(
+        content: String,
+        blobRef: String? = null,
+        contentType: String = "text",
+    ): String
+
     fun observeById(id: String): Flow<Item?>
 
     /** The whole life in reverse-chronological order — the Timeline (§19). */
