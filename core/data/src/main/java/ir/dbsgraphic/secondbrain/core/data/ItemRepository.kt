@@ -43,6 +43,9 @@ interface ItemRepository {
         content: String = "",
     ): String
 
+    /** Replace an item's text — used by AI enrichment (transcription, OCR). */
+    suspend fun updateContent(id: String, content: String)
+
     fun observeById(id: String): Flow<Item?>
 
     /** The whole life in reverse-chronological order — the Timeline (§19). */

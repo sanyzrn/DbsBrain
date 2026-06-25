@@ -22,6 +22,13 @@ class ItemRepositoryImpl @Inject constructor(
 
     override fun observeInboxCount(): Flow<Int> = itemDao.observeInboxCount()
 
+    override suspend fun updateContent(id: String, content: String) {
+        val trimmed = content.trim()
+        if (trimmed.isEmpty()) return
+        val item = itemDao.getById(id) ?: return
+        itemDao.update(item.copy(content = trimmed, updatedAt = clock.now()))
+    }
+
     override fun observeById(id: String): Flow<Item?> = itemDao.observeById(id)
 
     override fun observeTimeline(): Flow<List<Item>> = itemDao.observeTimeline()

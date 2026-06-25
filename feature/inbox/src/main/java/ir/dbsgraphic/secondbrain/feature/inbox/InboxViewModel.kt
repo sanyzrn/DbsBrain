@@ -3,6 +3,8 @@ package ir.dbsgraphic.secondbrain.feature.inbox
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import ir.dbsgraphic.secondbrain.core.ai.AIProvider
+import ir.dbsgraphic.secondbrain.core.ai.TriageSuggestion
 import ir.dbsgraphic.secondbrain.core.data.ItemRepository
 import ir.dbsgraphic.secondbrain.core.data.ProjectRepository
 import ir.dbsgraphic.secondbrain.core.database.entity.Item
@@ -13,6 +15,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -30,11 +33,13 @@ sealed interface InboxEvent {
 class InboxViewModel @Inject constructor(
     private val repository: ItemRepository,
     private val projectRepository: ProjectRepository,
+    private val aiProvider: AIProvider,
 ) : ViewModel() {
 
     private val draft = MutableStateFlow("")
     private val isSaving = MutableStateFlow(false)
     private val triageTarget = MutableStateFlow<Item?>(null)
+    private val triageSuggestion = MutableStateFlow<TriageSuggestion?>(null)
 
     private val content: Flow<InboxContent> = repository.observeInbox()
         .map { items ->
@@ -57,6 +62,8 @@ class InboxViewModel @Inject constructor(
                 projects = projects,
                 triageTarget = target,
             )
+        }.combine(triageSuggestion) { state, suggestion ->
+            state.copy(triageSuggestion = suggestion)
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
@@ -89,30 +96,46 @@ class InboxViewModel @Inject constructor(
         }
     }
 
-    /** Persist a photo captured in-app (§2: capture speed). */
+    /** Persist a photo, then (if AI is on) enrich its text with OCR — a
+     *  suggestion the user can edit/recover, never a hard decision (§12, §13). */
     fun capturePhoto(path: String) {
         viewModelScope.launch {
             runCatching { repository.captureBlob(path, "image", "photo") }
-                .onSuccess { _events.send(InboxEvent.Captured) }
+                .onSuccess { id ->
+                    _events.send(InboxEvent.Captured)
+                    aiProvider.ocr(path)?.let { repository.updateContent(id, it) }
+                }
                 .onFailure { _events.send(InboxEvent.Failed("ثبت عکس نشد")) }
         }
     }
 
-    /** Persist a recorded voice note. */
+    /** Persist a voice note, then (if AI is on) transcribe it. */
     fun captureVoice(path: String) {
         viewModelScope.launch {
             runCatching { repository.captureBlob(path, "voice", "voice") }
-                .onSuccess { _events.send(InboxEvent.Captured) }
+                .onSuccess { id ->
+                    _events.send(InboxEvent.Captured)
+                    aiProvider.transcribe(path)?.let { repository.updateContent(id, it) }
+                }
                 .onFailure { _events.send(InboxEvent.Failed("ثبت صدا نشد")) }
         }
     }
 
     fun openTriage(item: Item) {
         triageTarget.value = item
+        triageSuggestion.value = null
+        // AI only suggests — fetched in the background, applied only if the user taps it.
+        viewModelScope.launch {
+            val projectNames = runCatching {
+                projectRepository.observeProjects().first().map { it.name }
+            }.getOrDefault(emptyList())
+            triageSuggestion.value = aiProvider.suggestTriage(item.content, projectNames)
+        }
     }
 
     fun dismissTriage() {
         triageTarget.value = null
+        triageSuggestion.value = null
     }
 
     /** Triage the open item, then let it move out of the Inbox (§3). */
@@ -122,6 +145,7 @@ class InboxViewModel @Inject constructor(
             try {
                 repository.triage(target.id, type.value, projectId, tags)
                 triageTarget.value = null
+                triageSuggestion.value = null
                 _events.send(InboxEvent.Triaged)
             } catch (e: Exception) {
                 _events.send(InboxEvent.Failed("مرتب‌سازی ممکن نشد"))

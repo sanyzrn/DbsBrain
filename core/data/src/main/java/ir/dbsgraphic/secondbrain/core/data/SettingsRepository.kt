@@ -17,7 +17,24 @@ import javax.inject.Singleton
 enum class ThemeMode { SYSTEM, LIGHT, DARK }
 
 /**
- * User preferences (theme, onboarding). Stored locally with DataStore — no
+ * Optional AI assistant configuration. Disabled by default (§12: AI only
+ * suggests, never decides; the app is fully usable with it off). Provider-
+ * agnostic: any OpenAI-compatible endpoint (OpenAI / Gemini / Anthropic compat
+ * / local) works by setting the base URL, key and model names.
+ */
+data class AiConfig(
+    val enabled: Boolean = false,
+    val baseUrl: String = "https://api.openai.com/v1",
+    val apiKey: String = "",
+    val chatModel: String = "gpt-4o-mini",
+    val transcribeModel: String = "whisper-1",
+) {
+    /** Usable only when enabled and minimally configured. */
+    val isReady: Boolean get() = enabled && apiKey.isNotBlank() && baseUrl.isNotBlank()
+}
+
+/**
+ * User preferences (theme, onboarding, AI). Stored locally with DataStore — no
  * network, no cloud (Constitution §10, §11).
  */
 interface SettingsRepository {
@@ -26,6 +43,10 @@ interface SettingsRepository {
 
     fun observeOnboardingComplete(): Flow<Boolean>
     suspend fun setOnboardingComplete(complete: Boolean)
+
+    fun observeAiConfig(): Flow<AiConfig>
+    suspend fun setAiEnabled(enabled: Boolean)
+    suspend fun setAiConfig(baseUrl: String, apiKey: String, chatModel: String, transcribeModel: String)
 }
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "sb_settings")
@@ -37,6 +58,11 @@ class SettingsRepositoryImpl @Inject constructor(
 
     private val themeKey = stringPreferencesKey("theme_mode")
     private val onboardingKey = booleanPreferencesKey("onboarding_complete")
+    private val aiEnabledKey = booleanPreferencesKey("ai_enabled")
+    private val aiBaseUrlKey = stringPreferencesKey("ai_base_url")
+    private val aiApiKeyKey = stringPreferencesKey("ai_api_key")
+    private val aiChatModelKey = stringPreferencesKey("ai_chat_model")
+    private val aiTranscribeModelKey = stringPreferencesKey("ai_transcribe_model")
 
     override fun observeThemeMode(): Flow<ThemeMode> = context.dataStore.data.map { prefs ->
         when (prefs[themeKey]) {
@@ -56,5 +82,34 @@ class SettingsRepositoryImpl @Inject constructor(
 
     override suspend fun setOnboardingComplete(complete: Boolean) {
         context.dataStore.edit { it[onboardingKey] = complete }
+    }
+
+    override fun observeAiConfig(): Flow<AiConfig> = context.dataStore.data.map { prefs ->
+        val defaults = AiConfig()
+        AiConfig(
+            enabled = prefs[aiEnabledKey] ?: false,
+            baseUrl = prefs[aiBaseUrlKey] ?: defaults.baseUrl,
+            apiKey = prefs[aiApiKeyKey] ?: "",
+            chatModel = prefs[aiChatModelKey] ?: defaults.chatModel,
+            transcribeModel = prefs[aiTranscribeModelKey] ?: defaults.transcribeModel,
+        )
+    }
+
+    override suspend fun setAiEnabled(enabled: Boolean) {
+        context.dataStore.edit { it[aiEnabledKey] = enabled }
+    }
+
+    override suspend fun setAiConfig(
+        baseUrl: String,
+        apiKey: String,
+        chatModel: String,
+        transcribeModel: String,
+    ) {
+        context.dataStore.edit {
+            it[aiBaseUrlKey] = baseUrl.trim()
+            it[aiApiKeyKey] = apiKey.trim()
+            it[aiChatModelKey] = chatModel.trim()
+            it[aiTranscribeModelKey] = transcribeModel.trim()
+        }
     }
 }

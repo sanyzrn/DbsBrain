@@ -31,6 +31,14 @@ in **Space Mono** (the "instrument" voice). RTL is the host layout, not a mirror
 - **Offline-first**, no Firebase / no third-party cloud.
 - Custom design system on Compose Foundation; Material used only as a substrate.
 
+## Build status — Phase 5 (optional AI assistant)
+
+AI is **off by default** and reached only through a single `AIProvider`
+(no-op until enabled). Provider-agnostic OpenAI-compatible client (base URL +
+key + model). When enabled it only *adds suggestions* (§12): triage suggestions
+in the sheet, ask-your-brain over FTS in Search, and voice transcription / image
+OCR enrichment. Every call degrades to null — the app is fully usable with AI off.
+
 ## Build status — Phase 4 (capture-speed surfaces)
 
 Capture → triage → projects, **FTS5 Persian search** (normalized index+query,
