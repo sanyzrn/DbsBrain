@@ -181,6 +181,7 @@ fun InboxScreen(
         TriageSheet(
             item = target,
             projects = state.projects,
+            suggestion = state.triageSuggestion,
             onDismiss = onDismissTriage,
             onConfirm = onConfirmTriage,
             onCreateProject = onCreateProject,

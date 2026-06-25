@@ -29,6 +29,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ir.dbsgraphic.secondbrain.core.data.ThemeMode
 import ir.dbsgraphic.secondbrain.core.designsystem.R as DsR
 import ir.dbsgraphic.secondbrain.core.designsystem.component.SbCard
+import ir.dbsgraphic.secondbrain.core.designsystem.component.SbHairline
 import ir.dbsgraphic.secondbrain.core.designsystem.component.SbText
 import ir.dbsgraphic.secondbrain.core.designsystem.component.SbTextButton
 import ir.dbsgraphic.secondbrain.core.designsystem.theme.SecondBrainTheme
@@ -37,6 +38,7 @@ import ir.dbsgraphic.secondbrain.core.designsystem.theme.SecondBrainTheme
 fun SettingsRoute(
     onBack: () -> Unit,
     onOpenAbout: () -> Unit,
+    onOpenAi: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val themeMode by viewModel.themeMode.collectAsStateWithLifecycle()
@@ -44,6 +46,7 @@ fun SettingsRoute(
         themeMode = themeMode,
         onThemeModeChange = viewModel::setThemeMode,
         onOpenAbout = onOpenAbout,
+        onOpenAi = onOpenAi,
         onBack = onBack,
     )
 }
@@ -53,6 +56,7 @@ fun SettingsScreen(
     themeMode: ThemeMode,
     onThemeModeChange: (ThemeMode) -> Unit,
     onOpenAbout: () -> Unit,
+    onOpenAi: () -> Unit,
     onBack: () -> Unit,
 ) {
     val colors = SecondBrainTheme.colors
@@ -93,6 +97,8 @@ fun SettingsScreen(
         SectionLabel("بیشتر")
         Spacer(Modifier.height(space.sm))
         SbCard(padding = space.xs) {
+            NavRow(label = "دستیار هوشمند", subtitle = "اختیاری، پیش‌فرض خاموش", onClick = onOpenAi)
+            SbHairline(modifier = Modifier.padding(horizontal = space.md))
             NavRow(label = "درباره", subtitle = "سازنده، نسخه و راه‌های تماس", onClick = onOpenAbout)
         }
 

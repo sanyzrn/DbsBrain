@@ -1,6 +1,7 @@
 package ir.dbsgraphic.secondbrain.feature.inbox
 
 import androidx.compose.runtime.Immutable
+import ir.dbsgraphic.secondbrain.core.ai.TriageSuggestion
 import ir.dbsgraphic.secondbrain.core.database.entity.Item
 import ir.dbsgraphic.secondbrain.core.database.entity.Project
 
@@ -33,6 +34,7 @@ data class InboxUiState(
     val isSaving: Boolean = false,
     val projects: List<Project> = emptyList(),
     val triageTarget: Item? = null,
+    val triageSuggestion: TriageSuggestion? = null,
 ) {
     val canCapture: Boolean get() = draft.isNotBlank() && !isSaving
 }

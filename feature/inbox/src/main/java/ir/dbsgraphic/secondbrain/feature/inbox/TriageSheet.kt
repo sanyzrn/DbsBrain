@@ -27,8 +27,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import ir.dbsgraphic.secondbrain.core.ai.TriageSuggestion
 import ir.dbsgraphic.secondbrain.core.database.entity.Item
 import ir.dbsgraphic.secondbrain.core.database.entity.Project
+import ir.dbsgraphic.secondbrain.core.designsystem.component.SbCard
 import ir.dbsgraphic.secondbrain.core.designsystem.component.SbChip
 import ir.dbsgraphic.secondbrain.core.designsystem.component.SbPrimaryButton
 import ir.dbsgraphic.secondbrain.core.designsystem.component.SbText
@@ -46,6 +48,7 @@ import ir.dbsgraphic.secondbrain.core.designsystem.theme.SecondBrainTheme
 fun TriageSheet(
     item: Item,
     projects: List<Project>,
+    suggestion: TriageSuggestion?,
     onDismiss: () -> Unit,
     onConfirm: (type: ItemType, projectId: String?, tags: List<String>) -> Unit,
     onCreateProject: (String) -> Unit,
@@ -76,6 +79,32 @@ fun TriageSheet(
                 .padding(bottom = space.xxl),
         ) {
             SbText(text = item.content, style = type.bodyLarge, color = colors.text)
+
+            // ── AI suggestion (only suggests; user taps to apply, §12) ─────
+            val hasSuggestion = suggestion != null &&
+                (suggestion.type != null || suggestion.projectName != null || suggestion.tags.isNotEmpty())
+            if (hasSuggestion) {
+                Spacer(Modifier.height(space.lg))
+                SbCard(padding = space.md) {
+                    SbText(text = "پیشنهاد دستیار", style = type.monoSmall, color = colors.muted)
+                    Spacer(Modifier.height(space.xs))
+                    SbText(text = suggestionSummary(suggestion!!), style = type.body)
+                    Spacer(Modifier.height(space.sm))
+                    SbTextButton(
+                        label = "اعمال پیشنهاد",
+                        onClick = {
+                            suggestion.type?.let { t -> selectedType = ItemType.entries.find { it.value == t } }
+                            suggestion.projectName?.let { name ->
+                                selectedProjectId = projects.find { it.name == name }?.id
+                            }
+                            if (suggestion.tags.isNotEmpty()) {
+                                tags = (tags + suggestion.tags).distinct()
+                            }
+                        },
+                    )
+                }
+            }
+
             Spacer(Modifier.height(space.xl))
 
             // ── Type ──────────────────────────────────────────────────────
@@ -237,6 +266,22 @@ private fun SheetHandle() {
                 .background(colors.hairline),
         )
     }
+}
+
+private fun suggestionSummary(s: TriageSuggestion): String {
+    val parts = mutableListOf<String>()
+    s.type?.let { parts += "نوع: ${typeLabelFa(it)}" }
+    s.projectName?.let { parts += "پروژه: $it" }
+    if (s.tags.isNotEmpty()) parts += "برچسب: ${s.tags.joinToString("، ")}"
+    return if (parts.isEmpty()) "—" else parts.joinToString("  ·  ")
+}
+
+private fun typeLabelFa(value: String): String = when (value) {
+    "note" -> "یادداشت"
+    "task" -> "کار"
+    "idea" -> "ایده"
+    "doc" -> "سند"
+    else -> value
 }
 
 /** A bordered single-line field for the sheet (project name, tags). */

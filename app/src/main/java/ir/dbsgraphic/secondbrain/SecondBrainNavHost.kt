@@ -10,6 +10,7 @@ import ir.dbsgraphic.secondbrain.feature.onboarding.OnboardingRoute
 import ir.dbsgraphic.secondbrain.feature.project.ProjectRoute
 import ir.dbsgraphic.secondbrain.feature.search.SearchRoute
 import ir.dbsgraphic.secondbrain.feature.settings.AboutRoute
+import ir.dbsgraphic.secondbrain.feature.settings.AiSettingsRoute
 import ir.dbsgraphic.secondbrain.feature.settings.SettingsRoute
 
 object Routes {
@@ -20,6 +21,7 @@ object Routes {
     const val SEARCH = "search"
     const val SETTINGS = "settings"
     const val ABOUT = "about"
+    const val AI = "ai_settings"
     fun project(id: String) = "project/$id"
 }
 
@@ -73,11 +75,16 @@ fun SecondBrainNavHost(
             SettingsRoute(
                 onBack = { navController.popBackStack() },
                 onOpenAbout = { navController.navigate(Routes.ABOUT) },
+                onOpenAi = { navController.navigate(Routes.AI) },
             )
         }
 
         composable(Routes.ABOUT) {
             AboutRoute(onBack = { navController.popBackStack() })
+        }
+
+        composable(Routes.AI) {
+            AiSettingsRoute(onBack = { navController.popBackStack() })
         }
     }
 }

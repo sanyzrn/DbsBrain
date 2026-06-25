@@ -56,6 +56,7 @@ dependencies {
     implementation(project(":core:data"))
     implementation(project(":core:database"))
     implementation(project(":core:security"))
+    implementation(project(":core:ai"))
     implementation(project(":feature:inbox"))
     implementation(project(":feature:project"))
     implementation(project(":feature:timeline"))
