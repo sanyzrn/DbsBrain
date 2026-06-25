@@ -1,0 +1,21 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="220dp" android:height="200dp"
+    android:viewportWidth="200" android:viewportHeight="200">
+    <!-- column 1 (outline) -->
+    <path android:strokeColor="#1F6F5C" android:strokeWidth="5" android:fillColor="#00000000"
+        android:strokeLineJoin="round"
+        android:pathData="M46,104 L64,104 Q70,104 70,110 L70,154 Q70,160 64,160 L46,160 Q40,160 40,154 L40,110 Q40,104 46,104 Z" />
+    <!-- column 2 (filled, tallest) -->
+    <path android:fillColor="#1F6F5C"
+        android:pathData="M91,74 L109,74 Q115,74 115,80 L115,154 Q115,160 109,160 L91,160 Q85,160 85,154 L85,80 Q85,74 91,74 Z" />
+    <!-- column 3 (outline, short) -->
+    <path android:strokeColor="#9A9187" android:strokeWidth="5" android:fillColor="#00000000"
+        android:strokeLineJoin="round"
+        android:pathData="M136,121 L154,121 Q160,121 160,127 L160,154 Q160,160 154,160 L136,160 Q130,160 130,154 L130,127 Q130,121 136,121 Z" />
+    <!-- card sorting into column 2 -->
+    <path android:strokeColor="#D98E3C" android:strokeWidth="4" android:fillColor="#00000000"
+        android:strokeLineJoin="round"
+        android:pathData="M88,30 L112,30 Q117,30 117,35 L117,49 Q117,54 112,54 L88,54 Q83,54 83,49 L83,35 Q83,30 88,30 Z" />
+    <path android:strokeColor="#D98E3C" android:strokeWidth="4" android:strokeLineCap="round"
+        android:pathData="M100,58 L100,68" />
+</vector>

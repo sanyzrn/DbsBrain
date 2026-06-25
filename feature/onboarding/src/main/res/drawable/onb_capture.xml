@@ -1,0 +1,18 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="220dp" android:height="200dp"
+    android:viewportWidth="200" android:viewportHeight="200">
+    <!-- inbox frame -->
+    <path android:strokeColor="#1F6F5C" android:strokeWidth="5" android:fillColor="#00000000"
+        android:strokeLineJoin="round"
+        android:pathData="M73,55 L127,55 Q145,55 145,73 L145,127 Q145,145 127,145 L73,145 Q55,145 55,127 L55,73 Q55,55 73,55 Z" />
+    <!-- captured thought -->
+    <path android:fillColor="#D98E3C"
+        android:pathData="M100,100 m-9,0 a9,9 0 1,0 18,0 a9,9 0 1,0 -18,0" />
+    <!-- incoming sparks -->
+    <path android:strokeColor="#9A9187" android:strokeWidth="3" android:strokeLineCap="round"
+        android:pathData="M40,40 L62,62 M160,40 L138,62 M40,160 L62,138 M160,160 L138,138" />
+    <path android:fillColor="#9A9187" android:pathData="M34,34 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0" />
+    <path android:fillColor="#9A9187" android:pathData="M166,34 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0" />
+    <path android:fillColor="#1F6F5C" android:pathData="M34,166 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0" />
+    <path android:fillColor="#1F6F5C" android:pathData="M166,166 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0" />
+</vector>

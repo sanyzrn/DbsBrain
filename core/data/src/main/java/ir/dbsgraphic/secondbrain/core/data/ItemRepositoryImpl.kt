@@ -53,6 +53,31 @@ class ItemRepositoryImpl @Inject constructor(
         return item.id
     }
 
+    override suspend fun captureShared(content: String, blobRef: String?, contentType: String): String {
+        val text = content.trim().ifEmpty {
+            when (contentType) {
+                "image" -> "تصویر"
+                "file" -> "فایل"
+                "link" -> "لینک"
+                else -> "یادداشت"
+            }
+        }
+        val now = clock.now()
+        val item = Item(
+            id = idGenerator.newId(),
+            createdAt = now,
+            updatedAt = now,
+            content = text,
+            blobRef = blobRef,
+            contentType = contentType,
+            capturedVia = "share",
+            status = "inbox",
+            type = null,
+        )
+        itemDao.upsert(item)
+        return item.id
+    }
+
     override suspend fun triage(
         itemId: String,
         type: String,

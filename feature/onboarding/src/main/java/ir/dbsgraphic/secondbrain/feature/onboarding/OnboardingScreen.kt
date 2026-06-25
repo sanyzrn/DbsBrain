@@ -1,5 +1,6 @@
 package ir.dbsgraphic.secondbrain.feature.onboarding
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,6 +25,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import ir.dbsgraphic.secondbrain.core.designsystem.component.SbPrimaryButton
 import ir.dbsgraphic.secondbrain.core.designsystem.component.SbText
@@ -31,12 +33,12 @@ import ir.dbsgraphic.secondbrain.core.designsystem.component.SbTextButton
 import ir.dbsgraphic.secondbrain.core.designsystem.theme.SecondBrainTheme
 import kotlinx.coroutines.launch
 
-private data class Page(val title: String, val body: String)
+private data class Page(val image: Int, val title: String, val body: String)
 
 private val pages = listOf(
-    Page("ذهنت برای فکر کردن است،", "نه برای نگه‌داری. هر چیزی را در چند ثانیه ثبت کن و خیالت راحت باشد."),
-    Page("اول ثبت کن، بعد مرتب.", "همه‌چیز اول به صندوق ورودی می‌رود. هر وقت خواستی، آرام مرتبش کن."),
-    Page("همه‌چیز پیدا می‌شود.", "جستجوی فارسی و خط زمان، هر چیزی را که ثبت کرده‌ای برمی‌گرداند."),
+    Page(R.drawable.onb_capture, "ذهنت برای فکر کردن است،", "نه برای نگه‌داری. هر چیزی را در چند ثانیه ثبت کن و خیالت راحت باشد."),
+    Page(R.drawable.onb_triage, "اول ثبت کن، بعد مرتب.", "همه‌چیز اول به صندوق ورودی می‌رود. هر وقت خواستی، آرام مرتبش کن."),
+    Page(R.drawable.onb_search, "همه‌چیز پیدا می‌شود.", "جستجوی فارسی و خط زمان، هر چیزی را که ثبت کرده‌ای برمی‌گرداند."),
 )
 
 @Composable
@@ -73,6 +75,14 @@ fun OnboardingScreen(onComplete: () -> Unit) {
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Center,
             ) {
+                Image(
+                    painter = painterResource(page.image),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp),
+                )
+                Spacer(Modifier.height(space.xxxl))
                 SbText(text = page.title, style = type.display)
                 Spacer(Modifier.height(space.lg))
                 SbText(text = page.body, style = type.bodyLarge, color = colors.muted)
