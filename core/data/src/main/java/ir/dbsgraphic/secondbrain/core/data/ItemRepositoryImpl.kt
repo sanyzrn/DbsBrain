@@ -3,6 +3,7 @@ package ir.dbsgraphic.secondbrain.core.data
 import ir.dbsgraphic.secondbrain.core.database.PersianNormalizer
 import ir.dbsgraphic.secondbrain.core.database.dao.ItemDao
 import ir.dbsgraphic.secondbrain.core.database.dao.ItemLinkDao
+import ir.dbsgraphic.secondbrain.core.database.dao.ProjectDao
 import ir.dbsgraphic.secondbrain.core.database.dao.SearchDao
 import ir.dbsgraphic.secondbrain.core.database.entity.Item
 import ir.dbsgraphic.secondbrain.core.database.entity.ItemLink
@@ -15,6 +16,8 @@ class ItemRepositoryImpl @Inject constructor(
     private val itemDao: ItemDao,
     private val itemLinkDao: ItemLinkDao,
     private val searchDao: SearchDao,
+    private val projectDao: ProjectDao,
+    private val reminderScheduler: ReminderScheduler,
     private val clock: Clock,
     private val idGenerator: IdGenerator,
 ) : ItemRepository {
@@ -30,10 +33,23 @@ class ItemRepositoryImpl @Inject constructor(
         itemDao.update(item.copy(content = trimmed, updatedAt = clock.now()))
     }
 
+    override fun observeReminders(): Flow<List<Item>> = itemDao.observeReminders()
+
+    override suspend fun setReminder(id: String, whenMillis: Long?) {
+        val item = itemDao.getById(id) ?: return
+        itemDao.update(item.copy(reminderAt = whenMillis, updatedAt = clock.now()))
+        if (whenMillis != null && whenMillis > clock.now()) {
+            reminderScheduler.schedule(id, item.content, whenMillis)
+        } else {
+            reminderScheduler.cancel(id)
+        }
+    }
+
     override fun observeTrash(): Flow<List<Item>> = itemDao.observeTrashed()
 
     override suspend fun trash(id: String) {
         val item = itemDao.getById(id) ?: return
+        reminderScheduler.cancel(id)
         itemDao.update(item.copy(status = "trashed", updatedAt = clock.now()))
     }
 
@@ -45,12 +61,16 @@ class ItemRepositoryImpl @Inject constructor(
 
     override suspend fun deleteForever(id: String) {
         val item = itemDao.getById(id) ?: return
+        reminderScheduler.cancel(id)
         deleteBlob(item.blobRef)
         itemDao.deleteById(id)
     }
 
     override suspend fun emptyTrash() {
-        itemDao.observeTrashed().first().forEach { deleteBlob(it.blobRef) }
+        itemDao.observeTrashed().first().forEach {
+            reminderScheduler.cancel(it.id)
+            deleteBlob(it.blobRef)
+        }
         itemDao.deleteAllTrashed()
     }
 
@@ -152,15 +172,18 @@ class ItemRepositoryImpl @Inject constructor(
         tags: List<String>,
     ) {
         val item = itemDao.getById(itemId) ?: return
+        val now = clock.now()
         itemDao.update(
             item.copy(
                 type = type,
                 status = "triaged",
                 projectId = projectId,
                 tags = TagsCodec.encode(tags),
-                updatedAt = clock.now(),
+                updatedAt = now,
             ),
         )
+        // Keep the Projects list ordered by activity (§ review fix).
+        if (projectId != null) projectDao.touch(projectId, now)
     }
 
     override fun observeBacklinks(itemId: String): Flow<List<Item>> =
