@@ -31,6 +31,27 @@ in **Space Mono** (the "instrument" voice). RTL is the host layout, not a mirror
 - **Offline-first**, no Firebase / no third-party cloud.
 - Custom design system on Compose Foundation; Material used only as a substrate.
 
+## Build status — Phase 17 (Goals & weekly review — the keystone)
+
+The surface that ties the system together (§18 reflection, §19 the long view) —
+again with **no schema change**.
+
+- **Goals** are a vertical: an Item (`type=goal`) whose measurable target lives
+  in `details` (`GoalDetails`), whose deadline reuses `reminderAt`, which can sit
+  in a project and connect to supporting items through the existing link table. A
+  new "هدف‌ها" home page lists goals (unfinished first, by deadline) with a
+  progress bar, a one-step "انجام شد" or multi-step "+۱", and an add sheet
+  (target steps + deadline presets).
+- **Weekly review** is a read-only reflective surface (top-bar chart icon →
+  "مرور هفته") computed entirely from existing flows: what was captured and
+  triaged this week, habit/medicine check-ins and active days, upcoming vs.
+  overdue reminders, the inbox still to process, and goals active vs. achieved.
+  It stores nothing of its own.
+
+This completes the planned roadmap (Phases 1–17). Remaining work is the deferred
+R&D track (on-device AI, vector/semantic search, E2E multi-device sync), each of
+which gets its own design pass.
+
 ## Build status — Phase 16 (Medicine — schedules, doses, refills)
 
 Medicines as a vertical over the one pipeline — and **no schema change**: a

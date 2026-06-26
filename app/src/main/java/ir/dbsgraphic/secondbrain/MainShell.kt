@@ -39,13 +39,14 @@ import ir.dbsgraphic.secondbrain.core.designsystem.theme.SecondBrainTheme
 import ir.dbsgraphic.secondbrain.core.designsystem.util.rememberReducedMotion
 import ir.dbsgraphic.secondbrain.feature.finance.FinanceRoute
 import ir.dbsgraphic.secondbrain.feature.habits.HabitsRoute
+import ir.dbsgraphic.secondbrain.feature.goals.GoalsRoute
 import ir.dbsgraphic.secondbrain.feature.inbox.InboxRoute
 import ir.dbsgraphic.secondbrain.feature.medicine.MedicineRoute
 import ir.dbsgraphic.secondbrain.feature.project.ProjectsRoute
 import ir.dbsgraphic.secondbrain.feature.timeline.TimelineRoute
 import kotlinx.coroutines.launch
 
-private val sections = listOf("خط زمان", "صندوق", "پروژه‌ها", "عادت‌ها", "هزینه‌ها", "داروها")
+private val sections = listOf("خط زمان", "صندوق", "پروژه‌ها", "عادت‌ها", "هزینه‌ها", "داروها", "هدف‌ها")
 
 /**
  * The home: a swipeable pager across the three primary sections, with a quiet
@@ -59,6 +60,7 @@ fun MainShell(
     onOpenItem: (String) -> Unit,
     onOpenSearch: () -> Unit,
     onOpenReminders: () -> Unit,
+    onOpenReview: () -> Unit,
     onOpenSettings: () -> Unit,
 ) {
     val colors = SecondBrainTheme.colors
@@ -108,6 +110,8 @@ fun MainShell(
                 Spacer(Modifier.width(space.xs))
                 SbIconButton(icon = DsR.drawable.ic_bell, contentDescription = "یادآوری‌ها", onClick = onOpenReminders)
                 Spacer(Modifier.width(space.xs))
+                SbIconButton(icon = DsR.drawable.ic_review, contentDescription = "مرور هفته", onClick = onOpenReview)
+                Spacer(Modifier.width(space.xs))
                 SbIconButton(icon = DsR.drawable.ic_settings, contentDescription = "تنظیمات", onClick = onOpenSettings)
             }
         }
@@ -147,7 +151,8 @@ fun MainShell(
                 2 -> ProjectsRoute(onOpenProject = onOpenProject)
                 3 -> HabitsRoute(onOpenItem = onOpenItem)
                 4 -> FinanceRoute(onOpenItem = onOpenItem)
-                else -> MedicineRoute(onOpenItem = onOpenItem)
+                5 -> MedicineRoute(onOpenItem = onOpenItem)
+                else -> GoalsRoute(onOpenItem = onOpenItem)
             }
         }
     }
