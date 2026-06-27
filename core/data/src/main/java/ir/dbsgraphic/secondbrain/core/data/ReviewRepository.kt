@@ -50,8 +50,10 @@ class ReviewRepositoryImpl @Inject constructor(
             triaged = items.count { it.status == "triaged" && it.updatedAt >= weekStart },
             checkins = recentCheckins.size,
             activeDays = recentCheckins.map { it.dayStart }.distinct().size,
-            upcomingReminders = items.count { it.reminderAt != null && it.reminderAt in (now + 1)..weekAhead },
-            overdueReminders = items.count { it.reminderAt != null && it.reminderAt < now },
+            // Bind reminderAt to a local val: it's a public property from another
+            // module (core:database), so it can't be smart-cast in place.
+            upcomingReminders = items.count { val at = it.reminderAt; at != null && at in (now + 1)..weekAhead },
+            overdueReminders = items.count { val at = it.reminderAt; at != null && at < now },
             inbox = inbox,
             goalsAchieved = items.count {
                 it.type == "goal" && it.updatedAt >= weekStart && GoalCodec.decode(it.details).isAchieved
