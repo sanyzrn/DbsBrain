@@ -15,10 +15,14 @@ import ir.dbsgraphic.secondbrain.core.data.CalendarRepositoryImpl
 import ir.dbsgraphic.secondbrain.core.data.DeviceCalendarMirror
 import ir.dbsgraphic.secondbrain.core.data.FinanceRepository
 import ir.dbsgraphic.secondbrain.core.data.FinanceRepositoryImpl
+import ir.dbsgraphic.secondbrain.core.data.GoalRepository
+import ir.dbsgraphic.secondbrain.core.data.GoalRepositoryImpl
 import ir.dbsgraphic.secondbrain.core.data.HabitRepository
 import ir.dbsgraphic.secondbrain.core.data.HabitRepositoryImpl
 import ir.dbsgraphic.secondbrain.core.data.MedicineRepository
 import ir.dbsgraphic.secondbrain.core.data.MedicineRepositoryImpl
+import ir.dbsgraphic.secondbrain.core.data.ReviewRepository
+import ir.dbsgraphic.secondbrain.core.data.ReviewRepositoryImpl
 import ir.dbsgraphic.secondbrain.core.data.ProjectRepository
 import ir.dbsgraphic.secondbrain.core.data.ProjectRepositoryImpl
 import ir.dbsgraphic.secondbrain.core.data.SettingsRepository
@@ -62,6 +66,14 @@ abstract class DataModule {
     @Binds
     @Singleton
     abstract fun bindMedicineRepository(impl: MedicineRepositoryImpl): MedicineRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindGoalRepository(impl: GoalRepositoryImpl): GoalRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindReviewRepository(impl: ReviewRepositoryImpl): ReviewRepository
 
     companion object {
         @Provides

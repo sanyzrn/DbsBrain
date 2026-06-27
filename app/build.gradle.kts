@@ -69,6 +69,7 @@ dependencies {
     implementation(project(":feature:habits"))
     implementation(project(":feature:finance"))
     implementation(project(":feature:medicine"))
+    implementation(project(":feature:goals"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.core.splashscreen)

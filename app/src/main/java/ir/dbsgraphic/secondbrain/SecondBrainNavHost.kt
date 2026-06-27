@@ -11,6 +11,7 @@ import ir.dbsgraphic.secondbrain.feature.onboarding.OnboardingRoute
 import ir.dbsgraphic.secondbrain.feature.project.ProjectRoute
 import ir.dbsgraphic.secondbrain.feature.reminders.RemindersRoute
 import ir.dbsgraphic.secondbrain.feature.search.SearchRoute
+import ir.dbsgraphic.secondbrain.feature.goals.WeeklyReviewRoute
 import ir.dbsgraphic.secondbrain.feature.settings.AboutRoute
 import ir.dbsgraphic.secondbrain.feature.settings.AiSettingsRoute
 import ir.dbsgraphic.secondbrain.feature.settings.CalendarRoute
@@ -32,6 +33,7 @@ object Routes {
     const val CALENDAR = "calendar"
     const val ITEM = "item/{itemId}"
     const val REMINDERS = "reminders"
+    const val REVIEW = "review"
     fun project(id: String) = "project/$id"
     fun item(id: String) = "item/$id"
 }
@@ -69,6 +71,7 @@ fun SecondBrainNavHost(
                 onOpenItem = { id -> navController.navigate(Routes.item(id)) },
                 onOpenSearch = { navController.navigate(Routes.SEARCH) },
                 onOpenReminders = { navController.navigate(Routes.REMINDERS) },
+                onOpenReview = { navController.navigate(Routes.REVIEW) },
                 onOpenSettings = { navController.navigate(Routes.SETTINGS) },
             )
         }
@@ -105,6 +108,10 @@ fun SecondBrainNavHost(
                 onBack = { navController.popBackStack() },
                 onOpenItem = { id -> navController.navigate(Routes.item(id)) },
             )
+        }
+
+        composable(Routes.REVIEW) {
+            WeeklyReviewRoute(onBack = { navController.popBackStack() })
         }
 
         composable(Routes.SETTINGS) {
